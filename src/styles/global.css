@@ -13,8 +13,9 @@
 }
 
 :root { color-scheme: light; }
-* { border-color: var(--color-border); }
-html { background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); }
+* { border-color: var(--color-border); box-sizing: border-box; }
+html { background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); scroll-behavior: smooth; }
 body { min-width: 320px; margin: 0; }
-a, button { outline-offset: 3px; }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--color-primary); }
+a, button, input, select, textarea { outline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-primary); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { scroll-behavior: auto !important; } }

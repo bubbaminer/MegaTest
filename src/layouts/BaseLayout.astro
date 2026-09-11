@@ -1,5 +1,10 @@
 ---
 import '@/styles/global.css';
+import Header from '@/components/site/Header.astro';
+import Footer from '@/components/site/Footer.astro';
+import FloatingMenu from '@/components/site/FloatingMenu.astro';
+import BackToTop from '@/components/site/BackToTop.astro';
+import AdminSidebar from '@/components/admin/AdminSidebar.astro';
 
 interface Props {
   title: string;
@@ -14,35 +19,16 @@ interface Props {
 }
 
 const { title, description = '', canonicalUrl, robots, ogTitle, ogDescription, ogImageUrl, structuredData, noindex = false } = Astro.props;
-const structuredDataJson = structuredData && Object.keys(structuredData).length > 0
-  ? JSON.stringify(structuredData).replaceAll('<', '\\u003c')
-  : undefined;
+const isAdmin = Astro.url.pathname === '/admin' || Astro.url.pathname.startsWith('/admin/');
+const structuredDataJson = structuredData && Object.keys(structuredData).length > 0 ? JSON.stringify(structuredData).replaceAll('<', '\\u003c') : undefined;
 ---
 <!doctype html>
 <html lang="ru">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={description} />
-    <meta name="robots" content={noindex ? 'noindex,nofollow' : (robots ?? 'index,follow')} />
-    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-    <meta property="og:title" content={ogTitle ?? title} />
-    <meta property="og:description" content={ogDescription ?? description} />
-    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-    {structuredDataJson && <script is:inline type="application/ld+json" set:html={structuredDataJson} />}
-    <title>{title}</title>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="description" content={description} /><meta name="robots" content={noindex ? 'noindex,nofollow' : (robots ?? 'index,follow')} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}<meta property="og:title" content={ogTitle ?? title} /><meta property="og:description" content={ogDescription ?? description} />{ogImageUrl && <meta property="og:image" content={ogImageUrl} />}{structuredDataJson && <script is:inline type="application/ld+json" set:html={structuredDataJson} />}<title>{title}</title>
   </head>
-  <body class="min-h-screen bg-canvas text-ink antialiased">
-    <header class="border-b bg-white">
-      <div class="mx-auto flex min-h-16 max-w-6xl items-center justify-between px-6">
-        <a class="text-lg font-semibold" href="/">Digital Store</a>
-        <nav aria-label="Основная навигация" class="flex items-center gap-6 text-sm text-muted">
-          <a class="hover:text-ink" href="/catalog/">Каталог</a>
-          <a class="hover:text-ink" href="/games/">Игры</a>
-          <a class="hover:text-ink" href="/account">Аккаунт</a>
-        </nav>
-      </div>
-    </header>
-    <main><slot /></main>
+  <body class:list={["min-h-screen bg-canvas text-ink antialiased", !isAdmin && 'pb-20 sm:pb-0']}>
+    {isAdmin ? <><AdminSidebar /><div class="lg:pl-64"><main class="min-h-screen"><slot /></main></div></> : <><Header /><main id="main-content"><slot /></main><Footer /><FloatingMenu /><BackToTop /></>}
   </body>
 </html>
