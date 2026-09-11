@@ -1,14 +1,10 @@
 ---
 const path = Astro.url.pathname;
-const items = [
-  { href: '/admin', label: 'Обзор', exact: true },
-  { href: '/admin/content/pages', label: 'Страницы' },
-  { href: '/admin/media', label: 'Медиа' },
+const groups = [
+  { label: 'Главное', items: [{ href: '/admin', label: 'Обзор', exact: true }] },
+  { label: 'Каталог', items: [{ href: '/admin/catalog/games', label: 'Игры' }, { href: '/admin/catalog/categories', label: 'Категории' }] },
+  { label: 'Контент', items: [{ href: '/admin/content/pages', label: 'Страницы' }, { href: '/admin/media', label: 'Медиа' }] },
 ];
 const active = (item: { href: string; exact?: boolean }) => item.exact ? path === item.href : path.startsWith(item.href);
 ---
-<aside class="border-b bg-surface lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 lg:border-b-0 lg:border-r">
-  <div class="flex min-h-16 items-center justify-between px-5 lg:border-b"><a class="font-semibold" href="/admin">Digital Store Admin</a><a class="text-xs text-primary underline" href="/" target="_blank">Сайт ↗</a></div>
-  <nav aria-label="Административная навигация" class="overflow-x-auto px-3 py-3 lg:py-5"><ul class="flex gap-2 lg:block lg:space-y-1">{items.map((item) => <li><a aria-current={active(item) ? 'page' : undefined} class:list={["flex min-h-11 items-center whitespace-nowrap rounded-ui px-3 text-sm", active(item) ? 'bg-primary-soft font-semibold text-primary' : 'text-muted hover:bg-white hover:text-ink']} href={item.href}>{item.label}</a></li>)}</ul></nav>
-  <div class="hidden px-5 py-4 text-xs text-muted lg:block"><p>Каталог, заказы и аналитика появятся в следующих этапах.</p></div>
-</aside>
+<aside class="border-b bg-surface lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 lg:overflow-y-auto lg:border-b-0 lg:border-r"><div class="flex min-h-16 items-center justify-between px-5 lg:border-b"><a class="font-semibold" href="/admin">Digital Store Admin</a><a class="text-xs text-primary underline" href="/" target="_blank">Сайт ↗</a></div><nav aria-label="Административная навигация" class="overflow-x-auto px-3 py-3 lg:py-5"><div class="flex gap-5 lg:block lg:space-y-6">{groups.map((group) => <section><h2 class="hidden px-3 text-xs font-semibold uppercase tracking-wider text-muted lg:block">{group.label}</h2><ul class="flex gap-2 lg:mt-2 lg:block lg:space-y-1">{group.items.map((item) => <li><a aria-current={active(item) ? 'page' : undefined} class:list={["flex min-h-11 items-center whitespace-nowrap rounded-ui px-3 text-sm", active(item) ? 'bg-primary-soft font-semibold text-primary' : 'text-muted hover:bg-white hover:text-ink']} href={item.href}>{item.label}</a></li>)}</ul></section>)}</div></nav></aside>
