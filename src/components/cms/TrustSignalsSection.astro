@@ -1,0 +1,6 @@
+---
+import type { SectionDataMap } from '@/lib/cms/sections';
+interface Props { data: SectionDataMap['trust_signals'] }
+const { data } = Astro.props;
+---
+<section class="mx-auto max-w-6xl px-6 py-12 sm:py-16"><h2 class="text-3xl font-semibold tracking-tight">{data.title}</h2><div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{data.items.map((item) => <article class="rounded-xl border bg-white p-6"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden="true">✓</div><h3 class="mt-4 text-lg font-semibold">{item.title}</h3><p class="mt-2 text-sm leading-6 text-muted">{item.text}</p></article>)}</div></section>

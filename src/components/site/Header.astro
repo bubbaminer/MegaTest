@@ -2,15 +2,4 @@
 const path = Astro.url.pathname;
 const active = (href: string) => path === href || (href !== '/' && path.startsWith(href));
 ---
-<header class="sticky top-0 z-40 border-b bg-white/95 backdrop-blur">
-  <div class="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
-    <a class="text-lg font-semibold tracking-tight" href="/">Digital Store</a>
-    <nav aria-label="Основная навигация" class="hidden items-center gap-7 text-sm sm:flex">
-      <a class:list={["hover:text-ink", active('/catalog/') ? 'font-semibold text-primary' : 'text-muted']} href="/catalog/">Каталог</a>
-      <a class:list={["hover:text-ink", active('/games/') ? 'font-semibold text-primary' : 'text-muted']} href="/games/">Игры</a>
-      <a class:list={["hover:text-ink", active('/services/') ? 'font-semibold text-primary' : 'text-muted']} href="/services/">Услуги</a>
-      <a class:list={["hover:text-ink", active('/news/') ? 'font-semibold text-primary' : 'text-muted']} href="/news/">Новости</a>
-    </nav>
-    <div class="flex items-center gap-2"><a class="hidden min-h-11 items-center rounded-ui px-3 text-sm hover:bg-surface sm:inline-flex" href="/search" aria-label="Поиск">Поиск</a><a class="inline-flex min-h-11 items-center rounded-ui border px-4 text-sm font-medium hover:bg-surface" href="/account">Аккаунт</a></div>
-  </div>
-</header>
+<header class="sticky top-0 z-40 border-b bg-white/95 backdrop-blur"><div class="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6"><a class="text-lg font-semibold tracking-tight" href="/">Digital Store</a><nav aria-label="Основная навигация" class="hidden items-center gap-7 text-sm sm:flex"><a class:list={["hover:text-ink", active('/catalog/') || active('/games/') ? 'font-semibold text-primary' : 'text-muted']} href="/catalog/">Каталог</a><a class:list={["hover:text-ink", active('/news/') ? 'font-semibold text-primary' : 'text-muted']} href="/news/">Новости</a><a class:list={["hover:text-ink", active('/support') ? 'font-semibold text-primary' : 'text-muted']} href="/support">Поддержка</a></nav><div class="flex items-center gap-2"><a class="hidden min-h-11 items-center rounded-ui px-3 text-sm hover:bg-surface sm:inline-flex" href="/search">Поиск</a><a class="inline-flex min-h-11 items-center rounded-ui border px-4 text-sm font-medium hover:bg-surface" href="/account">Аккаунт</a></div></div></header>

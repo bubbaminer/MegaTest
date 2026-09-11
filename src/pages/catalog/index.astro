@@ -1,0 +1,16 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { listPublicGames } from '@/lib/catalog/public';
+const games = await listPublicGames();
+---
+<BaseLayout title="Каталог игр" description="Каталог цифровых игровых товаров и услуг">
+  <section class="mx-auto max-w-6xl px-6 py-12 sm:py-16">
+    <p class="text-sm font-semibold text-primary">Каталог</p>
+    <h1 class="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">Выберите игру</h1>
+    <p class="mt-4 max-w-2xl text-lg text-muted">Товары и услуги организованы внутри игр — без дублирования игровых страниц.</p>
+    {games.length === 0 ? <div class="mt-10 rounded-xl border border-dashed p-10 text-center"><h2 class="text-lg font-semibold">Каталог пока пуст</h2><p class="mt-2 text-muted">Активируйте хотя бы одну игру в административной панели.</p></div> : <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{games.map((game) => <a class="group overflow-hidden rounded-xl border bg-white transition hover:-translate-y-0.5 hover:border-primary" href={`/games/${game.slug}`}>
+      {game.imageUrl ? <img class="aspect-video w-full bg-surface object-cover" src={game.imageUrl} alt={game.name} loading="lazy" /> : <div class="flex aspect-video items-center justify-center bg-primary-soft text-4xl" aria-hidden="true">🎮</div>}
+      <div class="p-5"><div class="flex items-center gap-3">{game.logoUrl && <img class="h-10 w-10 rounded-ui border object-cover" src={game.logoUrl} alt="" />}<h2 class="text-xl font-semibold group-hover:text-primary">{game.name}</h2></div>{game.shortDescription && <p class="mt-3 line-clamp-3 text-sm leading-6 text-muted">{game.shortDescription}</p>}<span class="mt-5 inline-flex text-sm font-semibold text-primary">Открыть игру →</span></div>
+    </a>)}</div>}
+  </section>
+</BaseLayout>
