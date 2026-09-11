@@ -7,13 +7,13 @@ export interface PublishedPage {
   id: string;
   title: string;
   slug: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  canonicalUrl?: string;
-  robotsDirectives?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImageUrl?: string;
+  metaTitle: string | undefined;
+  metaDescription: string | undefined;
+  canonicalUrl: string | undefined;
+  robotsDirectives: string | undefined;
+  ogTitle: string | undefined;
+  ogDescription: string | undefined;
+  ogImageUrl: string | undefined;
   structuredData: Record<string, unknown>;
   sections: CmsSection<SectionType>[];
 }
