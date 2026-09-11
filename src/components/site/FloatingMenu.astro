@@ -1,0 +1,14 @@
+---
+const path = Astro.url.pathname;
+const links = [
+  { href: '/', label: 'Главная', icon: '⌂' },
+  { href: '/catalog/', label: 'Каталог', icon: '▦' },
+  { href: '/search', label: 'Поиск', icon: '⌕' },
+  { href: '/cart', label: 'Корзина', icon: '◫' },
+  { href: '/account', label: 'Аккаунт', icon: '○' },
+];
+const active = (href: string) => path === href || (href !== '/' && path.startsWith(href));
+---
+<nav aria-label="Мобильная навигация" class="fixed inset-x-3 bottom-3 z-50 rounded-xl border bg-white/95 p-1 shadow-lg backdrop-blur sm:hidden">
+  <ul class="grid grid-cols-5">{links.map((link) => <li><a aria-current={active(link.href) ? 'page' : undefined} class:list={["flex min-h-12 flex-col items-center justify-center rounded-lg text-[11px]", active(link.href) ? 'bg-primary-soft font-semibold text-primary' : 'text-muted']} href={link.href}><span aria-hidden="true" class="text-lg leading-none">{link.icon}</span><span class="mt-1">{link.label}</span></a></li>)}</ul>
+</nav>

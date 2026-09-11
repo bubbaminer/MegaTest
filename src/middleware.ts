@@ -6,7 +6,7 @@ import { logger } from '@/lib/logging/logger';
 export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
   const isAccount = path === '/account' || path.startsWith('/account/');
-  const isAdmin = path === '/admin' || path.startsWith('/admin/');
+  const isAdmin = path === '/admin' || path.startsWith('/admin/') || path.startsWith('/api/admin/');
   if (!isAccount && !isAdmin) return next();
 
   const token = context.cookies.get('sb-access-token')?.value;

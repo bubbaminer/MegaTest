@@ -1,14 +1,21 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import CmsPageRenderer from '@/components/cms/CmsPageRenderer.astro';
+import { getPublishedPage } from '@/lib/cms/repository';
+
+const page = await getPublishedPage('home');
+if (!page) Astro.response.status = 503;
 ---
-<BaseLayout title="Digital Store" description="Платформа цифровых игровых товаров">
-  <section class="mx-auto max-w-6xl px-6 py-16 sm:py-24">
-    <div class="max-w-3xl">
-      <p class="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">Foundation</p>
-      <h1 class="text-4xl font-semibold tracking-tight sm:text-6xl">Надёжное ядро магазина готово к наполнению</h1>
-      <p class="mt-6 max-w-2xl text-lg leading-8 text-muted">
-        Публичная главная будет собираться из управляемых CMS-блоков на следующем этапе. Этот экран не является финальным контентом магазина.
-      </p>
-    </div>
-  </section>
+<BaseLayout
+  title={page?.metaTitle ?? page?.title ?? 'Страница не настроена'}
+  description={page?.metaDescription}
+  canonicalUrl={page?.canonicalUrl}
+  robots={page?.robotsDirectives}
+  ogTitle={page?.ogTitle}
+  ogDescription={page?.ogDescription}
+  ogImageUrl={page?.ogImageUrl}
+  structuredData={page?.structuredData}
+  noindex={!page}
+>
+  {page ? <CmsPageRenderer page={page} /> : <section class="mx-auto max-w-3xl px-6 py-24"><h1 class="text-3xl font-semibold">Страница не настроена</h1><p class="mt-4 text-muted">Создайте и опубликуйте страницу с идентификатором home в CMS.</p></section>}
 </BaseLayout>
