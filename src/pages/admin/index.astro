@@ -3,13 +3,10 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Администрирование" noindex>
   <section class="mx-auto max-w-6xl px-6 py-12">
-    <div class="flex items-center justify-between gap-6">
-      <div><p class="text-sm font-semibold text-primary">Admin</p><h1 class="mt-2 text-3xl font-semibold">Панель управления</h1></div>
-      <form method="post" action="/api/auth/logout"><button class="min-h-11 rounded-ui border px-4" type="submit">Выйти</button></form>
-    </div>
+    <div class="flex items-center justify-between gap-6"><div><p class="text-sm font-semibold text-primary">Admin</p><h1 class="mt-2 text-3xl font-semibold">Панель управления</h1></div><form method="post" action="/api/auth/logout"><button class="min-h-11 rounded-ui border px-4" type="submit">Выйти</button></form></div>
     <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <a class="rounded-xl border p-6 hover:bg-surface" href="/admin/content/pages"><h2 class="text-lg font-semibold">Страницы</h2><p class="mt-2 text-sm text-muted">Создание и публикация CMS-страниц.</p></a>
-      <div class="rounded-xl border p-6 opacity-60"><h2 class="text-lg font-semibold">Медиа</h2><p class="mt-2 text-sm text-muted">Следующий инкремент.</p></div>
+      <a class="rounded-xl border p-6 hover:bg-surface" href="/admin/content/pages"><h2 class="text-lg font-semibold">Страницы</h2><p class="mt-2 text-sm text-muted">Страницы, SEO и управляемые секции.</p></a>
+      <a class="rounded-xl border p-6 hover:bg-surface" href="/admin/media"><h2 class="text-lg font-semibold">Медиа</h2><p class="mt-2 text-sm text-muted">Загрузка и повторное использование изображений.</p></a>
       <div class="rounded-xl border p-6 opacity-60"><h2 class="text-lg font-semibold">Новости</h2><p class="mt-2 text-sm text-muted">Следующий инкремент.</p></div>
     </div>
   </section>
