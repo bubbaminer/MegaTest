@@ -1,0 +1,13 @@
+---
+import HeroSection from './HeroSection.astro';
+import RichTextSection from './RichTextSection.astro';
+import ImageTextSection from './ImageTextSection.astro';
+import CtaSection from './CtaSection.astro';
+import type { CmsSection, SectionDataMap, SectionType } from '@/lib/cms/sections';
+interface Props { section: CmsSection<SectionType> }
+const { section } = Astro.props;
+---
+{section.type === 'hero' && <HeroSection data={section.data as SectionDataMap['hero']} />}
+{section.type === 'rich_text' && <RichTextSection data={section.data as SectionDataMap['rich_text']} />}
+{section.type === 'image_text' && <ImageTextSection data={section.data as SectionDataMap['image_text']} />}
+{section.type === 'cta' && <CtaSection data={section.data as SectionDataMap['cta']} />}

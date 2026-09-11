@@ -1,0 +1,15 @@
+---
+import type { SectionDataMap } from '@/lib/cms/sections';
+interface Props { data: SectionDataMap['hero'] }
+const { data } = Astro.props;
+---
+<section class="border-b bg-surface">
+  <div class="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 sm:py-24 lg:grid-cols-2">
+    <div class="max-w-2xl">
+      <h1 class="text-4xl font-semibold tracking-tight sm:text-6xl">{data.title}</h1>
+      {data.subtitle && <p class="mt-6 text-lg leading-8 text-muted">{data.subtitle}</p>}
+      {data.cta && <a class="mt-8 inline-flex min-h-11 items-center rounded-ui bg-primary px-5 py-3 font-semibold text-white hover:opacity-90" href={data.cta.url}>{data.cta.label}</a>}
+    </div>
+    {data.imageUrl && <img class="aspect-[4/3] w-full rounded-xl border object-cover" src={data.imageUrl} alt="" loading="eager" />}
+  </div>
+</section>

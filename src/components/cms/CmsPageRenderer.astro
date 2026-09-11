@@ -1,0 +1,7 @@
+---
+import SectionRenderer from './SectionRenderer.astro';
+import type { PublishedPage } from '@/lib/cms/repository';
+interface Props { page: PublishedPage }
+const { page } = Astro.props;
+---
+{page.sections.map((section) => <SectionRenderer section={section} />)}

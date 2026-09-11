@@ -1,0 +1,14 @@
+---
+import type { SectionDataMap } from '@/lib/cms/sections';
+interface Props { data: SectionDataMap['image_text'] }
+const { data } = Astro.props;
+const imageFirst = data.imagePosition !== 'right';
+---
+<section class="mx-auto grid max-w-6xl items-center gap-10 px-6 py-12 sm:py-16 lg:grid-cols-2">
+  <img class:list={["aspect-[4/3] w-full rounded-xl border object-cover", !imageFirst && "lg:order-2"]} src={data.imageUrl} alt={data.imageAlt ?? ''} loading="lazy" />
+  <div class:list={[!imageFirst && "lg:order-1"]}>
+    <h2 class="text-3xl font-semibold tracking-tight">{data.title}</h2>
+    <p class="mt-4 whitespace-pre-line leading-7 text-muted">{data.text}</p>
+    {data.cta && <a class="mt-6 inline-flex min-h-11 items-center rounded-ui border bg-white px-5 py-3 font-semibold hover:bg-surface" href={data.cta.url}>{data.cta.label}</a>}
+  </div>
+</section>

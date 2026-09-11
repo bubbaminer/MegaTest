@@ -1,0 +1,8 @@
+---
+import type { SectionDataMap } from '@/lib/cms/sections';
+interface Props { data: SectionDataMap['rich_text'] }
+const { data } = Astro.props;
+---
+<section class="mx-auto max-w-3xl px-6 py-12 sm:py-16">
+  <div class="whitespace-pre-line text-base leading-8 text-ink">{data.content}</div>
+</section>
