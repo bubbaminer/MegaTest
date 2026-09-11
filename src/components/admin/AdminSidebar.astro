@@ -2,7 +2,7 @@
 const path = Astro.url.pathname;
 const groups = [
   { label: 'Главное', items: [{ href: '/admin', label: 'Обзор', exact: true }] },
-  { label: 'Каталог', items: [{ href: '/admin/catalog/games', label: 'Игры' }, { href: '/admin/catalog/categories', label: 'Категории' }] },
+  { label: 'Магазин', items: [{ href: '/admin/catalog/games', label: 'Каталог игр' }] },
   { label: 'Контент', items: [{ href: '/admin/content/pages', label: 'Страницы' }, { href: '/admin/media', label: 'Медиа' }] },
 ];
 const active = (item: { href: string; exact?: boolean }) => item.exact ? path === item.href : path.startsWith(item.href);
