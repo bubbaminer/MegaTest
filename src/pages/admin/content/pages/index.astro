@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { listCmsPages } from '@/lib/cms/admin';
+const auth = Astro.locals.auth;
+if (!auth) return Astro.redirect('/login');
+const pages = await listCmsPages(auth.accessToken);
+const created = Astro.url.searchParams.has('created');
+const error = Astro.url.searchParams.get('error');
+---
+<BaseLayout title="CMS-страницы" noindex>
+  <section class="mx-auto max-w-6xl px-6 py-12">
+    <a class="text-sm text-primary underline" href="/admin">← Панель управления</a>
+    <h1 class="mt-4 text-3xl font-semibold">CMS-страницы</h1>
+    {created && <div class="mt-6 rounded-ui border border-green-200 bg-green-50 p-4 text-green-800">Черновик страницы создан.</div>}
+    {error && <div role="alert" class="mt-6 rounded-ui border border-red-200 bg-red-50 p-4 text-red-700">Не удалось создать страницу: {error}</div>}
+    <div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div class="overflow-x-auto rounded-xl border">
+        <table class="w-full text-left text-sm"><thead class="bg-surface"><tr><th class="px-4 py-3">Название</th><th class="px-4 py-3">URL</th><th class="px-4 py-3">Статус</th></tr></thead><tbody>
+          {pages.map((page) => <tr class="border-t"><td class="px-4 py-4 font-medium">{page.title}</td><td class="px-4 py-4">/{page.slug === 'home' ? '' : page.slug}</td><td class="px-4 py-4">{page.status}</td></tr>)}
+        </tbody></table>
+      </div>
+      <form class="h-fit rounded-xl border p-6" method="post" action="/api/admin/pages">
+        <h2 class="text-lg font-semibold">Новая страница</h2>
+        <label class="mt-5 block"><span class="mb-2 block text-sm font-medium">Название</span><input class="min-h-11 w-full rounded-ui border px-3" name="title" required /></label>
+        <label class="mt-4 block"><span class="mb-2 block text-sm font-medium">Slug</span><input class="min-h-11 w-full rounded-ui border px-3" name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*" placeholder="about" required /></label>
+        <button class="mt-5 min-h-11 w-full rounded-ui bg-primary px-5 py-3 font-semibold text-white" type="submit">Создать черновик</button>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
