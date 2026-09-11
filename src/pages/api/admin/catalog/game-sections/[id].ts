@@ -1,0 +1,4 @@
+import type { APIRoute } from 'astro';
+import { AppError } from '@/lib/errors/app-error';
+import { runGameSectionAction,updateGameSection } from '@/lib/catalog/admin';
+export const POST:APIRoute=async({params,request,locals,redirect})=>{if(!locals.auth||!params.id)return redirect('/login',303);const form=await request.formData();const gameId=String(form.get('gameId')??'');const action=String(form.get('action')??'update');try{if(action==='update')await updateGameSection(locals.auth.accessToken,params.id,String(form.get('type')??''),String(form.get('data')??''));else await runGameSectionAction(locals.auth.accessToken,params.id,action);return redirect(`/admin/catalog/games/${gameId}?sectionSaved=1`,303);}catch(error){const code=error instanceof AppError?error.code:'INTERNAL_ERROR';return redirect(`/admin/catalog/games/${gameId}?error=${code.toLowerCase()}`,303);}};
