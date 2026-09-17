@@ -1,7 +1,12 @@
 ---
 import HeroSection from './HeroSection.astro'; import RichTextSection from './RichTextSection.astro'; import ImageTextSection from './ImageTextSection.astro'; import CtaSection from './CtaSection.astro'; import TrustSignalsSection from './TrustSignalsSection.astro'; import ExpertProfileSection from './ExpertProfileSection.astro'; import ProcessStepsSection from './ProcessStepsSection.astro'; import FeaturedProductsSection from './FeaturedProductsSection.astro';
+import FeaturedGamesSection from './FeaturedGamesSection.astro';
+import FaqSection from './FaqSection.astro';
 import type { CmsSection, SectionDataMap, SectionType } from '@/lib/cms/sections';
 interface Props { section: CmsSection<SectionType>; gameId?: string | undefined }
 const { section, gameId } = Astro.props;
 ---
 {section.type === 'hero' && <HeroSection data={section.data as SectionDataMap['hero']} />}{section.type === 'rich_text' && <RichTextSection data={section.data as SectionDataMap['rich_text']} />}{section.type === 'image_text' && <ImageTextSection data={section.data as SectionDataMap['image_text']} />}{section.type === 'cta' && <CtaSection data={section.data as SectionDataMap['cta']} />}{section.type === 'trust_signals' && <TrustSignalsSection data={section.data as SectionDataMap['trust_signals']} />}{section.type === 'expert_profile' && <ExpertProfileSection data={section.data as SectionDataMap['expert_profile']} />}{section.type === 'process_steps' && <ProcessStepsSection data={section.data as SectionDataMap['process_steps']} />}{section.type === 'featured_products' && <FeaturedProductsSection data={section.data as SectionDataMap['featured_products']} gameId={gameId} />}
+
+{section.type === 'featured_games' && <FeaturedGamesSection data={section.data as SectionDataMap['featured_games']} />}
+{section.type === 'faq' && <FaqSection data={section.data as SectionDataMap['faq']} />}

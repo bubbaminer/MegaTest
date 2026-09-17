@@ -1,3 +1,5 @@
+import { isSafeLink } from '@/lib/validation/urls';
+
 export const sectionTypes = ['hero','rich_text','image_text','featured_products','featured_games','faq','cta','trust_signals','expert_profile','process_steps'] as const;
 export type SectionType = (typeof sectionTypes)[number];
 
@@ -21,7 +23,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
 const isText = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
 const isOptionalText = (value: unknown): value is string | undefined => value === undefined || typeof value === 'string';
 const isStringArray = (value: unknown): value is string[] => Array.isArray(value) && value.every(isText);
-const isCta = (value: unknown): value is Cta => isRecord(value) && isText(value.label) && isText(value.url);
+const isCta = (value: unknown): value is Cta => isRecord(value) && isText(value.label) && isSafeLink(value.url);
 const isInfoItems = (value: unknown): value is InfoItem[] => Array.isArray(value) && value.length > 0 && value.every((item) => isRecord(item) && isText(item.title) && isText(item.text));
 export function isSectionType(value: unknown): value is SectionType { return typeof value === 'string' && (sectionTypes as readonly string[]).includes(value); }
 export function validateSectionData<T extends SectionType>(type: T, value: unknown): value is SectionDataMap[T] {

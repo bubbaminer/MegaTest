@@ -60,11 +60,13 @@ export async function uploadMediaAsset(accessToken: string, actorId: string, fil
 }
 
 export async function updateMediaAlt(accessToken: string, id: string, alt: string): Promise<void> {
-  const { error } = await createServerSupabaseClient(accessToken).from('media_assets').update({ alt: alt.trim() || null }).eq('id', id).is('deleted_at', null);
+  const { data: updated, error } = await createServerSupabaseClient(accessToken).from('media_assets').update({ alt: alt.trim() || null }).eq('id', id).is('deleted_at', null).select('id').maybeSingle();
   if (error) throw new AppError('INTERNAL_ERROR', 'Unable to update media metadata', { code: error.code });
+  if (!updated) throw new AppError('NOT_FOUND', 'Media asset not found or not editable');
 }
 
 export async function archiveMediaAsset(accessToken: string, id: string): Promise<void> {
-  const { error } = await createServerSupabaseClient(accessToken).from('media_assets').update({ deleted_at: new Date().toISOString() }).eq('id', id).is('deleted_at', null);
+  const { data: updated, error } = await createServerSupabaseClient(accessToken).from('media_assets').update({ deleted_at: new Date().toISOString() }).eq('id', id).is('deleted_at', null).select('id').maybeSingle();
   if (error) throw new AppError('INTERNAL_ERROR', 'Unable to archive media asset', { code: error.code });
+  if (!updated) throw new AppError('NOT_FOUND', 'Media asset not found or not editable');
 }

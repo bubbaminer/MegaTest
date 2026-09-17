@@ -1,0 +1,16 @@
+---
+import type { SectionDataMap } from '@/lib/cms/sections';
+import { listPublicFaq } from '@/lib/cms/faq';
+interface Props { data: SectionDataMap['faq'] }
+const { data } = Astro.props;
+const entries = await listPublicFaq(data.faqIds);
+---
+{entries.length > 0 && <section class="mx-auto max-w-3xl px-6 py-12 sm:py-16">
+  <h2 class="text-3xl font-semibold">{data.title ?? 'Вопросы и ответы'}</h2>
+  <div class="mt-8 space-y-3">
+    {entries.map((entry) => <details class="rounded-xl border p-5">
+      <summary class="cursor-pointer font-semibold">{entry.question}</summary>
+      <p class="mt-4 whitespace-pre-line leading-7 text-muted">{entry.answer}</p>
+    </details>)}
+  </div>
+</section>}

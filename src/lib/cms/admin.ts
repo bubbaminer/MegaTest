@@ -1,5 +1,5 @@
 import { AppError } from '@/lib/errors/app-error';
-import { isSectionType, validateSectionData, type SectionType } from '@/lib/cms/sections';
+import { isSectionType, validateSectionData } from '@/lib/cms/sections';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export type ContentStatus = 'draft' | 'scheduled' | 'published' | 'archived';
@@ -78,14 +78,19 @@ export async function updateCmsPage(accessToken: string, id: string, input: Reco
   const status = input.status as ContentStatus;
   if (!title || !slugPattern.test(slug) || !statuses.includes(status)) throw new AppError('BAD_REQUEST', 'Invalid page data');
   const supabase = createServerSupabaseClient(accessToken);
-  const { error } = await supabase.from('cms_pages').update({
+  const { data: existing, error: readError } = await supabase.from('cms_pages')
+    .select('id,published_at').eq('id', id).is('deleted_at', null).maybeSingle();
+  if (readError) throw new AppError('INTERNAL_ERROR', 'Unable to load CMS page', { code: readError.code });
+  if (!existing) throw new AppError('NOT_FOUND', 'CMS page not found');
+  const { data: updated, error } = await supabase.from('cms_pages').update({
     title, slug, status,
-    published_at: status === 'published' ? new Date().toISOString() : null,
+    published_at: status === 'published' ? existing.published_at ?? new Date().toISOString() : existing.published_at,
     meta_title: nullable(input.metaTitle ?? ''), meta_description: nullable(input.metaDescription ?? ''),
     canonical_url: nullable(input.canonicalUrl ?? ''), robots_directives: nullable(input.robotsDirectives ?? ''),
     og_title: nullable(input.ogTitle ?? ''), og_description: nullable(input.ogDescription ?? ''), og_image_url: nullable(input.ogImageUrl ?? ''),
-  }).eq('id', id);
+  }).eq('id', id).is('deleted_at', null).select('id').maybeSingle();
   if (error) throw new AppError(error.code === '23505' ? 'CONFLICT' : 'INTERNAL_ERROR', 'Unable to update CMS page', { code: error.code });
+  if (!updated) throw new AppError('NOT_FOUND', 'CMS page not found or not editable');
 }
 
 export async function createCmsSection(accessToken: string, pageId: string, typeValue: string, json: string): Promise<void> {
@@ -104,22 +109,25 @@ export async function updateCmsSection(accessToken: string, id: string, typeValu
   let data: unknown;
   try { data = JSON.parse(json); } catch { throw new AppError('BAD_REQUEST', 'Section data must be valid JSON'); }
   if (!validateSectionData(typeValue, data)) throw new AppError('BAD_REQUEST', 'Section data does not match its type');
-  const { error } = await createServerSupabaseClient(accessToken).from('page_sections').update({ type: typeValue, data }).eq('id', id);
+  const { data: updated, error } = await createServerSupabaseClient(accessToken).from('page_sections').update({ type: typeValue, data }).eq('id', id).select('id').maybeSingle();
   if (error) throw new AppError('INTERNAL_ERROR', 'Unable to update section', { code: error.code });
+  if (!updated) throw new AppError('NOT_FOUND', 'Section not found or not editable');
 }
 
 export async function runSectionAction(accessToken: string, id: string, action: string): Promise<void> {
   const supabase = createServerSupabaseClient(accessToken);
   if (action === 'delete') {
-    const { error } = await supabase.from('page_sections').delete().eq('id', id);
+    const { data: deleted, error } = await supabase.from('page_sections').delete().eq('id', id).select('id').maybeSingle();
     if (error) throw new AppError('INTERNAL_ERROR', 'Unable to delete section', { code: error.code });
+    if (!deleted) throw new AppError('NOT_FOUND', 'Section not found or not editable');
     return;
   }
   if (action === 'toggle') {
     const { data, error: readError } = await supabase.from('page_sections').select('is_visible').eq('id', id).single();
     if (readError) throw new AppError('NOT_FOUND', 'Section not found');
-    const { error } = await supabase.from('page_sections').update({ is_visible: !data.is_visible }).eq('id', id);
+    const { data: updated, error } = await supabase.from('page_sections').update({ is_visible: !data.is_visible }).eq('id', id).select('id').maybeSingle();
     if (error) throw new AppError('INTERNAL_ERROR', 'Unable to toggle section', { code: error.code });
+    if (!updated) throw new AppError('NOT_FOUND', 'Section not found or not editable');
     return;
   }
   if (action === 'up' || action === 'down') {

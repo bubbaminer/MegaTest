@@ -14,3 +14,19 @@ async function mediaUrlMap(ids:string[]):Promise<Map<string,string>>{ const uniq
 function mapGame(row:GameRow,media:Map<string,string>,sections:CmsSection<SectionType>[]=[]):PublicGame{return{id:row.id,name:row.name,slug:row.slug,shortDescription:row.short_description??'',description:descriptionText(row.description),logoUrl:row.logo_media_id?media.get(row.logo_media_id):undefined,imageUrl:row.image_media_id?media.get(row.image_media_id):undefined,bannerUrl:row.banner_media_id?media.get(row.banner_media_id):undefined,sections};}
 export async function listPublicGames():Promise<PublicGame[]>{const {data,error}=await createServerSupabaseClient().from('games').select('id,name,slug,short_description,description,logo_media_id,image_media_id,banner_media_id').order('sort_order').order('name');if(error)throw new AppError('INTERNAL_ERROR','Unable to load game catalog',{code:error.code});const rows=(data??[])as GameRow[];const media=await mediaUrlMap(rows.flatMap((row)=>[row.logo_media_id,row.image_media_id,row.banner_media_id].filter((id):id is string=>Boolean(id))));return rows.map((row)=>mapGame(row,media));}
 export async function getPublicGame(slug:string):Promise<PublicGame|null>{const supabase=createServerSupabaseClient();const {data,error}=await supabase.from('games').select('id,name,slug,short_description,description,logo_media_id,image_media_id,banner_media_id').eq('slug',slug).maybeSingle();if(error)throw new AppError('INTERNAL_ERROR','Unable to load game',{code:error.code});if(!data)return null;const row=data as GameRow;const [{data:sectionRows,error:sectionError},media]=await Promise.all([supabase.from('game_sections').select('id,type,data,sort_order,is_visible').eq('game_id',row.id).eq('is_visible',true).order('sort_order'),mediaUrlMap([row.logo_media_id,row.image_media_id,row.banner_media_id].filter((id):id is string=>Boolean(id)))]);if(sectionError)throw new AppError('INTERNAL_ERROR','Unable to load game sections',{code:sectionError.code});const sections=(sectionRows??[]).map((item)=>mapSectionRow(item)).filter((item):item is CmsSection<SectionType>=>item!==null);return mapGame(row,media,sections);}
+
+export async function listFeaturedGames(ids: string[] = []): Promise<PublicGame[]> {
+  let query = createServerSupabaseClient().from('games')
+    .select('id,name,slug,short_description,description,logo_media_id,image_media_id,banner_media_id')
+    .eq('status', 'active').is('deleted_at', null)
+    .order('sort_order').order('name').limit(24);
+  if (ids.length) query = query.in('id', ids.slice(0, 24));
+  const { data, error } = await query;
+  if (error) throw new AppError('INTERNAL_ERROR', 'Unable to load featured games', { code: error.code });
+  const rows = (data ?? []) as GameRow[];
+  const media = await mediaUrlMap(rows.flatMap((row) =>
+    [row.logo_media_id, row.image_media_id, row.banner_media_id].filter((id): id is string => Boolean(id))
+  ));
+  const games = rows.map((row) => mapGame(row, media));
+  return ids.length ? games.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id)) : games;
+}
