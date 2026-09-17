@@ -2,21 +2,14 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getCmsPageForAdmin } from '@/lib/cms/admin';
 import { sectionTypes } from '@/lib/cms/sections';
+import { sectionLabel, sectionTemplates } from '@/lib/cms/section-editor';
 const auth = Astro.locals.auth;
 if (!auth) return Astro.redirect('/login');
 const page = Astro.params.id ? await getCmsPageForAdmin(auth.accessToken, Astro.params.id) : null;
 if (!page) Astro.response.status = 404;
 const notice = Astro.url.searchParams.has('saved') ? 'Страница сохранена.' : Astro.url.searchParams.has('sectionCreated') ? 'Секция добавлена.' : Astro.url.searchParams.has('sectionSaved') ? 'Секция обновлена.' : undefined;
 const error = Astro.url.searchParams.get('error');
-const templates: Record<string, string> = {
-  hero: '{"title":"Заголовок","subtitle":"Подзаголовок","cta":{"label":"Кнопка","url":"/catalog/"}}',
-  rich_text: '{"content":"Текст секции"}',
-  image_text: '{"title":"Заголовок","text":"Текст","imageUrl":"https://...","imageAlt":"Описание"}',
-  featured_products: '{"productIds":[],"title":"Популярные товары"}',
-  featured_games: '{"gameIds":[],"title":"Популярные игры"}',
-  faq: '{"faqIds":[],"title":"Вопросы и ответы"}',
-  cta: '{"title":"Призыв к действию","text":"Описание","action":{"label":"Продолжить","url":"/catalog/"}}',
-};
+const templates = sectionTemplates;
 ---
 <BaseLayout title={page ? `Редактирование: ${page.title}` : 'Страница не найдена'} noindex>
   <section class="mx-auto max-w-6xl px-6 py-12">
@@ -31,9 +24,9 @@ const templates: Record<string, string> = {
         <button class="mt-5 min-h-11 rounded-ui bg-primary px-5 py-3 font-semibold text-white" type="submit">Сохранить страницу</button>
       </form>
       <div class="mt-10"><h2 class="text-2xl font-semibold">Секции</h2><div class="mt-5 space-y-5">
-        {page.sections.map((section, index) => <article class="rounded-xl border p-6"><div class="flex flex-wrap items-center justify-between gap-3"><div><h3 class="font-semibold">{section.type}</h3><p class="text-sm text-muted">Позиция {index + 1} · {section.isVisible ? 'видима' : 'скрыта'}</p></div><div class="flex flex-wrap gap-2"><form method="post" action={`/api/admin/sections/${section.id}`}><input type="hidden" name="pageId" value={page.id}/><button class="min-h-10 rounded-ui border px-3" name="action" value="up">↑</button><button class="min-h-10 rounded-ui border px-3" name="action" value="down">↓</button><button class="min-h-10 rounded-ui border px-3" name="action" value="toggle">{section.isVisible ? 'Скрыть' : 'Показать'}</button><button class="min-h-10 rounded-ui border border-red-200 px-3 text-red-700" name="action" value="delete">Удалить</button></form></div></div><form class="mt-4" method="post" action={`/api/admin/sections/${section.id}`}><input type="hidden" name="pageId" value={page.id}/><input type="hidden" name="action" value="update"/><input type="hidden" name="type" value={section.type}/><textarea class="min-h-40 w-full rounded-ui border p-3 font-mono text-sm" name="data">{JSON.stringify(section.data, null, 2)}</textarea><button class="mt-3 min-h-10 rounded-ui bg-primary px-4 text-sm font-semibold text-white" type="submit">Сохранить секцию</button></form></article>)}
+        {page.sections.map((section, index) => <article class="rounded-xl border p-6"><div class="flex flex-wrap items-center justify-between gap-3"><div><h3 class="font-semibold">{sectionLabel(section.type)}</h3><p class="text-sm text-muted">Позиция {index + 1} · {section.isVisible ? 'видима' : 'скрыта'}</p></div><div class="flex flex-wrap gap-2"><form method="post" action={`/api/admin/sections/${section.id}`}><input type="hidden" name="pageId" value={page.id}/><button class="min-h-10 rounded-ui border px-3" name="action" value="up">↑</button><button class="min-h-10 rounded-ui border px-3" name="action" value="down">↓</button><button class="min-h-10 rounded-ui border px-3" name="action" value="toggle">{section.isVisible ? 'Скрыть' : 'Показать'}</button><button class="min-h-10 rounded-ui border border-red-200 px-3 text-red-700" name="action" value="delete">Удалить</button></form></div></div><form class="mt-4" method="post" action={`/api/admin/sections/${section.id}`}><input type="hidden" name="pageId" value={page.id}/><input type="hidden" name="action" value="update"/><input type="hidden" name="type" value={section.type}/><textarea class="min-h-40 w-full rounded-ui border p-3 font-mono text-sm" name="data">{JSON.stringify(section.data, null, 2)}</textarea><button class="mt-3 min-h-10 rounded-ui bg-primary px-4 text-sm font-semibold text-white" type="submit">Сохранить секцию</button></form></article>)}
       </div></div>
-      <form class="mt-8 rounded-xl border p-6" method="post" action={`/api/admin/pages/${page.id}/sections`}><h2 class="text-xl font-semibold">Добавить секцию</h2><label class="mt-5 block">Тип<select id="section-type" class="mt-2 min-h-11 w-full rounded-ui border px-3" name="type">{sectionTypes.map((type) => <option value={type}>{type}</option>)}</select></label><label class="mt-4 block">Данные JSON<textarea id="section-data" class="mt-2 min-h-40 w-full rounded-ui border p-3 font-mono text-sm" name="data">{templates.hero}</textarea></label><button class="mt-5 min-h-11 rounded-ui bg-primary px-5 py-3 font-semibold text-white" type="submit">Добавить секцию</button></form>
+      <form class="mt-8 rounded-xl border p-6" method="post" action={`/api/admin/pages/${page.id}/sections`}><h2 class="text-xl font-semibold">Добавить секцию</h2><label class="mt-5 block">Тип<select id="section-type" class="mt-2 min-h-11 w-full rounded-ui border px-3" name="type">{sectionTypes.map((type) => <option value={type}>{sectionLabel(type)}</option>)}</select></label><label class="mt-4 block">Данные JSON<textarea id="section-data" class="mt-2 min-h-40 w-full rounded-ui border p-3 font-mono text-sm" name="data">{templates.hero}</textarea></label><button class="mt-5 min-h-11 rounded-ui bg-primary px-5 py-3 font-semibold text-white" type="submit">Добавить секцию</button></form>
       <script is:inline define:vars={{ templates }}>document.getElementById('section-type')?.addEventListener('change', (event) => { const input = document.getElementById('section-data'); if (input instanceof HTMLTextAreaElement && event.target instanceof HTMLSelectElement) input.value = templates[event.target.value] ?? '{}'; });</script>
     </>}
   </section>

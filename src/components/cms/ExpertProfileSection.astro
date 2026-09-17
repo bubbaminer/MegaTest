@@ -1,0 +1,6 @@
+---
+import type { SectionDataMap } from '@/lib/cms/sections';
+interface Props { data: SectionDataMap['expert_profile'] }
+const { data } = Astro.props;
+---
+<section class="mx-auto max-w-4xl px-6 py-12"><article class="grid gap-6 rounded-xl border bg-surface p-6 sm:grid-cols-[7rem_1fr] sm:p-8">{data.imageUrl ? <img class="h-28 w-28 rounded-xl border object-cover" src={data.imageUrl} alt={data.name} loading="lazy" /> : <div class="flex h-28 w-28 items-center justify-center rounded-xl bg-primary-soft text-3xl" aria-hidden="true">★</div>}<div><p class="text-sm font-semibold text-primary">Эксперт</p><h2 class="mt-1 text-2xl font-semibold">{data.name}</h2><p class="mt-1 text-sm text-muted">{data.role}</p><p class="mt-4 leading-7">{data.bio}</p>{data.credentials && <ul class="mt-4 flex flex-wrap gap-2">{data.credentials.map((item) => <li class="rounded-full border bg-white px-3 py-1 text-xs">{item}</li>)}</ul>}</div></article></section>

@@ -1,0 +1,54 @@
+name: Verify
+on:
+  push:
+    branches: [main, feat/catalog-core]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PUBLIC_SUPABASE_URL: https://example.supabase.co
+      PUBLIC_SUPABASE_ANON_KEY: build-only-placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm run verify
+
+  profile-permissions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check profile grant migration on an isolated database
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/fixtures/profile_permissions.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/202609170001_profile_update_permissions.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/profile_permissions.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/fixtures/profile_preserved.sql

@@ -1,0 +1,8 @@
+---
+import type { SectionDataMap } from '@/lib/cms/sections';
+import { listPublicProducts } from '@/lib/catalog/products';
+interface Props { data: SectionDataMap['featured_products']; gameId?: string | undefined }
+const { data, gameId } = Astro.props;
+const products = await listPublicProducts({ gameId, ids: data.productIds.length ? data.productIds : undefined });
+---
+<section class="mx-auto max-w-6xl px-6 py-12 sm:py-16"><div class="flex items-end justify-between gap-4"><h2 class="text-3xl font-semibold tracking-tight">{data.title ?? 'Товары'}</h2>{gameId && <span class="text-sm text-muted">{products.length} позиций</span>}</div>{products.length === 0 ? <div class="mt-8 rounded-xl border border-dashed p-8 text-center text-muted">Активных товарных позиций пока нет.</div> : <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{products.map((product) => <a class="group overflow-hidden rounded-xl border bg-white hover:border-primary" href={`/products/${product.slug}`}>{product.imageUrl ? <img class="aspect-video w-full bg-surface object-cover" src={product.imageUrl} alt={product.name} loading="lazy" /> : <div class="flex aspect-video items-center justify-center bg-primary-soft text-3xl" aria-hidden="true">◆</div>}<div class="p-5"><h3 class="text-lg font-semibold group-hover:text-primary">{product.name}</h3>{product.shortDescription && <p class="mt-2 line-clamp-2 text-sm text-muted">{product.shortDescription}</p>}<div class="mt-5 flex items-baseline gap-2"><strong class="text-xl">{product.formattedPrice}</strong>{product.formattedOldPrice && <s class="text-sm text-muted">{product.formattedOldPrice}</s>}</div></div></a>)}</div>}</section>

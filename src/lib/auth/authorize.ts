@@ -9,6 +9,9 @@ export async function authenticate(accessToken: string | undefined): Promise<Aut
   if (!accessToken) throw new AppError('UNAUTHENTICATED', 'Authentication required');
   const supabase = createServerSupabaseClient(accessToken);
   const { data: userData, error: userError } = await supabase.auth.getUser(accessToken);
+  if (userError && (!userError.status || userError.status >= 500 || userError.status === 429)) {
+    throw new AppError('INTERNAL_ERROR', 'Authentication service temporarily unavailable');
+  }
   if (userError || !userData.user) throw new AppError('UNAUTHENTICATED', 'Invalid session');
 
   const { data: profile, error: profileError } = await supabase
