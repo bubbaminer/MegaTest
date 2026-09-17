@@ -5,6 +5,14 @@ import { hasPermission } from '@/lib/auth/roles';
 import { adminApiPermission } from '@/lib/auth/route-permissions';
 import { logger } from '@/lib/logging/logger';
 
+function privateResponse(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set('Cache-Control', 'private, no-store');
+  return new Response(response.body, {
+    status: response.status, statusText: response.statusText, headers,
+  });
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
   const isAdminApi = path === '/api/admin' || path.startsWith('/api/admin/');
@@ -12,7 +20,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isAdmin = path === '/admin' || path.startsWith('/admin/') || isAdminApi;
   if (!isAccount && !isAdmin) return next();
 
-  context.response.headers.set('Cache-Control', 'private, no-store');
   try {
     const auth = await resolveAuthSession(context.cookies);
     if (isAdmin && !hasPermission(auth.role, 'admin:access')) {
@@ -31,7 +38,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' },
       });
     }
-    return context.redirect(appError.code === 'UNAUTHENTICATED' ? '/login' : '/', 303);
+    return privateResponse(context.redirect(appError.code === 'UNAUTHENTICATED' ? '/login' : '/', 303));
   }
-  return next();
+  return privateResponse(await next());
 });
